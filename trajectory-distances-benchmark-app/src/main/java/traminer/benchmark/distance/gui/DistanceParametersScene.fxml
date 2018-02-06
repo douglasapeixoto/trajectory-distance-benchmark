@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="paramsRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="180.0" prefWidth="265.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ChoiceBox fx:id="ptsDistanceBox" layoutX="11.0" layoutY="39.0" prefHeight="31.0" prefWidth="238.0" />
+      <Label layoutX="11.0" layoutY="11.0" text="Points Distance Measure:" />
+      <Label fx:id="paramALabel" layoutX="11.0" layoutY="90.0" text="Parameter_a:" />
+      <Label fx:id="paramBLabel" layoutX="10.0" layoutY="136.0" text="Parameter_b:" />
+      <TextField fx:id="paramATxt" layoutX="150.0" layoutY="85.0" prefHeight="31.0" prefWidth="100.0" />
+      <TextField fx:id="paramBTxt" layoutX="149.0" layoutY="131.0" prefHeight="31.0" prefWidth="100.0" />
+   </children>
+</AnchorPane>
