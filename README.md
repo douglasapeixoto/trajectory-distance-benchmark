@@ -49,8 +49,8 @@ The following image shows the application main GUI window.
 		-- *Start Time:* The new trajectory's start time.
 		
 - **Translation:**  Translates a trajectory on the XY axis for the given translation values.
-		-- *Translation X:* Translation value over the X axis, may be positive or negative.
-		-- *Translation Y:* Translation value over the Y axis,  may be positive or negative.
+	- *Translation X:* Translation value over the X axis, may be positive or negative.
+	- *Translation Y:* Translation value over the Y axis,  may be positive or negative.
 
 
 
