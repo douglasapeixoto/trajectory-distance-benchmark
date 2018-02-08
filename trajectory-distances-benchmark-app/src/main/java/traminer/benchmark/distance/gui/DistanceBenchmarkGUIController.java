@@ -37,6 +37,7 @@ import traminer.benchmark.distance.DistancePair;
 import traminer.benchmark.distance.TrajectoryTransformationService;
 import traminer.io.IOService;
 import traminer.io.reader.TrajectoryReader;
+import traminer.util.spatial.SpatialUtils;
 import traminer.util.spatial.distance.EuclideanDistanceFunction;
 import traminer.util.spatial.distance.HaversineDistanceFunction;
 import traminer.util.spatial.distance.PointDistanceFunction;
@@ -468,6 +469,9 @@ public class DistanceBenchmarkGUIController implements Initializable {
 	
 	@FXML 
 	private void actionStart() {
+		// check mandatory fields
+		if (!validate()) return;
+		
 		// read datasets
 		String dataPath1 = inputDataTxt1.getText();
 		String dataPath2 = inputDataTxt2.getText();
@@ -490,6 +494,9 @@ public class DistanceBenchmarkGUIController implements Initializable {
 		// run distances
 		List<DistancePair> distancePairs = getDistances();
 
+		// Normalize distances
+		distancePairs = doNormalization(distancePairs);
+		
 		// sort results
 		doSort(distancePairs);
 
@@ -498,7 +505,7 @@ public class DistanceBenchmarkGUIController implements Initializable {
 		
 		showInfoMessage("Finished!!!\nDistances calculation in: " + runningTime + "ms.");
 	}
-	
+
 	@FXML 
 	private void actionOpenDataset1() {
     	final DirectoryChooser dirChooser = new DirectoryChooser();
@@ -681,6 +688,35 @@ public class DistanceBenchmarkGUIController implements Initializable {
 	
 	// This should be in the Model
 	/**
+	 * Calculates the distances between every trajectory in the
+	 * Dataset-A to every trajectory in the Dataset-B.
+	 * 
+	 * @return A list of distances pairs, containing a pair of
+	 * trajectories IDs and their distance, the result list
+	 * contains (list1.size * list2.size) elements.
+	 */
+	private List<DistancePair> getDistances() {
+		List<DistancePair> distancePairs = 
+				new ArrayList<>(datasetA.size() * datasetB.size());
+		double distance;
+		
+		final long startTime = System.currentTimeMillis();
+		for (Trajectory t1 : datasetA) {
+			String tid1 = t1.getId();
+			for (Trajectory t2 : datasetB) {
+				String tid2 = t2.getId();
+				distance = trajectoryDistanceFunc.getDistance(t1, t2);
+				distancePairs.add(new DistancePair(tid1, tid2, distance));
+			}
+		}
+		final long endTime = System.currentTimeMillis();
+		runningTime = endTime - startTime;
+		
+		return distancePairs;
+	}
+	
+	// This should be in the Model
+	/**
 	 * Run the required transformations on each dataset.
 	 * Several transformations may be performed on each
 	 * dataset.
@@ -753,35 +789,6 @@ public class DistanceBenchmarkGUIController implements Initializable {
 
 	// This should be in the Model
 	/**
-	 * Calculates the distances between every trajectory in the
-	 * Dataset-A to every trajectory in the Dataset-B.
-	 * 
-	 * @return A list of distances pairs, containing a pair of
-	 * trajectories IDs and their distance, the result list
-	 * contains (list1.size * list2.size) elements.
-	 */
-	private List<DistancePair> getDistances() {
-		List<DistancePair> distancePairs = 
-				new ArrayList<>(datasetA.size() * datasetB.size());
-		double distance;
-		
-		final long startTime = System.currentTimeMillis();
-		for (Trajectory t1 : datasetA) {
-			String tid1 = t1.getId();
-			for (Trajectory t2 : datasetB) {
-				String tid2 = t2.getId();
-				distance = trajectoryDistanceFunc.getDistance(t1, t2);
-				distancePairs.add(new DistancePair(tid1, tid2, distance));
-			}
-		}
-		final long endTime = System.currentTimeMillis();
-		runningTime = endTime - startTime;
-		
-		return distancePairs;
-	}
-
-	// This should be in the Model
-	/**
 	 * Sorts the list of disntace pairs using the user-specified parameter.
 	 * @param distancePairs The list to sort.
 	 */
@@ -800,6 +807,55 @@ public class DistanceBenchmarkGUIController implements Initializable {
 	
 	// This should be in the Model
 	/**
+	 * Normalize the distance values as required.
+	 * 
+	 * @param distancePairs The list to normalize.
+	 * @return The list of values after normalization.
+	 */
+	private List<DistancePair> doNormalization(List<DistancePair> distancePairs) {
+		final String normalizationOption = normalizationChoiceBox.getValue();
+		
+		// nothing to do
+		if (normalizationOption.equals(NONE)) return distancePairs;
+		
+		// get the distances values
+		List<Double> distances = new ArrayList<>(distancePairs.size());
+		for (DistancePair pair : distancePairs) {
+			distances.add(pair.getDistance());
+		}
+		
+		// MIN-MAX normalization
+		if (normalizationOption.equals(MIN_MAX)) {
+			double min;
+			double max;
+			try {
+				min = Double.parseDouble(normalizationMinTxt.getText());
+				max = Double.parseDouble(normalizationMaxTxt.getText());
+				distances = SpatialUtils.minMaxNormalization(distances, min, max);
+			} catch (IllegalArgumentException e) {
+				showErrorMessage("Invalid values for Min/Max normalization.");
+			}
+		} else 
+		// MEAN-STD - Z-scores normalization	
+		if (normalizationOption.equals(MEAN_STD)) {
+			distances = SpatialUtils.meanStdNormalization(distances);
+		}
+		
+		// update values
+		List<DistancePair> newPairs = new ArrayList<>(distancePairs.size());
+		for (int i=0; i<distances.size(); i++) {
+			double normDist = distances.get(i);
+			DistancePair pair = distancePairs.get(i);
+			newPairs.add(new DistancePair(pair.getTrajectory1ID(), 
+										  pair.getTrajectory2ID(),
+										  normDist));
+		}
+		
+		return newPairs;
+	}
+	
+	// This should be in the Model
+	/**
 	 * Save the benchmark results to the user-defined directory.
 	 * 
 	 * @param distancePairs The list with the results.
@@ -814,6 +870,30 @@ public class DistanceBenchmarkGUIController implements Initializable {
 		}
 	}
 
+	/**
+	 * Validates the required parameters.
+	 * 
+	 * @return True if validation passed.
+	 */
+	private boolean validate() {
+		if (inputDataTxt1.getText().isEmpty()) {
+			showErrorMessage("Please, provide a path to dataset A.");
+			inputDataTxt1.requestFocus();
+			return false;
+		}
+		if (inputDataTxt2.getText().isEmpty()) {
+			showErrorMessage("Please, provide a path to dataset B.");
+			inputDataTxt2.requestFocus();
+			return false;
+		}
+		if (outputDataTxt.getText().isEmpty()) {
+			showErrorMessage("Please, provide a path to the output data.");
+			outputDataTxt.requestFocus();
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Open a simple ERROR alert/dialog with the given message.
 	 * 
@@ -903,5 +983,10 @@ public class DistanceBenchmarkGUIController implements Initializable {
 		}
 	}
 	
+    @FXML
+    public void actionClearChart() {
+    	distanceChart.getData().clear();
+    	distanceChart.autosize();
+    }
 
 }

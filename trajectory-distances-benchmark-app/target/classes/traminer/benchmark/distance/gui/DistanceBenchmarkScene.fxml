@@ -116,7 +116,7 @@
                               <Label layoutX="16.0" layoutY="155.0" text="Sort Results By:" />
                               <ChoiceBox fx:id="normalizationChoiceBox" layoutX="16.0" layoutY="112.0" prefHeight="31.0" prefWidth="220.0" />
                               <Label layoutX="18.0" layoutY="86.0" text="Normalization:" />
-                              <TextField fx:id="normalizationMinTxt" disable="true" layoutX="274.0" layoutY="112.0" prefHeight="31.0" prefWidth="60.0" text="1" />
+                              <TextField fx:id="normalizationMinTxt" disable="true" layoutX="274.0" layoutY="112.0" prefHeight="31.0" prefWidth="60.0" text="0" />
                               <TextField fx:id="normalizationMaxTxt" disable="true" layoutX="354.0" layoutY="112.0" prefHeight="31.0" prefWidth="60.0" text="100" />
                               <Label layoutX="275.0" layoutY="84.0" text="Min:" />
                               <Label layoutX="355.0" layoutY="83.0" text="Max:" />
@@ -171,7 +171,7 @@
                   <Label layoutX="23.0" layoutY="9.0" text="Open Distances Data:" />
                   <Separator layoutX="426.0" layoutY="27.0" orientation="VERTICAL" prefHeight="46.0" prefWidth="0.0" />
                   <Button layoutX="620.0" layoutY="34.0" mnemonicParsing="false" onAction="#actionLoadDataToChart" prefHeight="31.0" prefWidth="70.0" text="Load" />
-                  <Button fx:id="clearChartBtn" layoutX="825.0" layoutY="35.0" mnemonicParsing="false" text="Clear Chart" />
+                  <Button fx:id="clearChartBtn" layoutX="825.0" layoutY="35.0" mnemonicParsing="false" onAction="#actionClearChart" text="Clear Chart" />
                </children></AnchorPane>
 		 </content>
       </Tab>
