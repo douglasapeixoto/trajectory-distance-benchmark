@@ -174,7 +174,9 @@ public class TrajectoryTransformationService implements Serializable {
 	private static List<Trajectory> doTransformation(List<Trajectory> trajectoryList) {
 		List<Trajectory> result = new ArrayList<Trajectory>(trajectoryList.size());
 		for (Trajectory t : trajectoryList) {
-			result.add(transformation.getTransformation(t));
+			Trajectory newTr = transformation.getTransformation(t);
+			newTr.setId(t.getId());
+			result.add(newTr);
 		}
 		return result;
 	}

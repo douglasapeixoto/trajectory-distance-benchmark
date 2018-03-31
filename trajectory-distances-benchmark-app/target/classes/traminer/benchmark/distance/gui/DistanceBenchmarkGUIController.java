@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -29,9 +30,10 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-
+import javafx.stage.Stage;
 import traminer.benchmark.distance.DistanceFunction;
 import traminer.benchmark.distance.DistancePair;
 import traminer.benchmark.distance.TrajectoryTransformationService;
@@ -633,6 +635,31 @@ public class DistanceBenchmarkGUIController implements Initializable {
 	}
 	
 	/**
+	 * Open and show the content of an HTML file
+	 * in a browser-like window.
+	 * 
+	 * @see HelpBrowser
+	 */
+	@FXML
+	private void actionHelp() {
+		// HTML file must be inside the application's resources folder.
+		final String helpHtmlFile = "app-help-index.html";
+		try {
+			String helpContent = IOService.
+					readResourcesFileContent(helpHtmlFile);
+			Scene scene = new Scene(
+					new HelpBrowser(helpContent, 750, 500), 
+					Color.web("#666970")); ;
+			Stage outputStage = new Stage();
+			outputStage.setTitle("Trajectory Distances Help");
+			outputStage.setScene(scene);
+			outputStage.show();
+		} catch (IOException e) {
+			showErrorMessage("Error opening help HTML file.");
+		}		
+	}
+	
+	/**
 	 * Creates the distance function parameters setup window.
 	 */
 	private void createParametersPane() {	
@@ -984,7 +1011,7 @@ public class DistanceBenchmarkGUIController implements Initializable {
 	}
 	
     @FXML
-    public void actionClearChart() {
+    private void actionClearChart() {
     	distanceChart.getData().clear();
     	distanceChart.autosize();
     }

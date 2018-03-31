@@ -140,7 +140,7 @@
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <Button fx:id="helpBtn" contentDisplay="TOP" layoutX="478.0" layoutY="445.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="63.0" text="Help" underline="true">
+                  <Button fx:id="helpBtn" contentDisplay="TOP" layoutX="478.0" layoutY="445.0" mnemonicParsing="false" onAction="#actionHelp" prefHeight="39.0" prefWidth="63.0" text="Help" underline="true">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
